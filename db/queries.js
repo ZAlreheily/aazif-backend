@@ -1,4 +1,5 @@
 const sqlite3 = require('sqlite3').verbose();
+const sqlite = require("sqlite");
 const bcrypt = require('bcrypt');
 
 const getDbConnection = async () => {
@@ -9,25 +10,28 @@ const getDbConnection = async () => {
 };
 async function isCorrectCredStudent(id, password) {
     const db = await getDbConnection();
-    const rows = await db.all(`SELECT stupassword FROM STUDENT WHERE SID = ${id}`);
+    const rows = await db.all(`SELECT stupassword FROM STUDENT WHERE SID = ?`, [id]);
     await db.close();
-    hashed = rows[0];
-    const match = bcrypt.compare(password, hashed);
+    hashed = await rows[0]["stuPassword"];
+    const match = await bcrypt.compare(password, hashed);
     return match;
 };
 
 async function isCorrectCredMGT(username, password) {
     const db = await getDbConnection();
-    const rows = await db.all(`SELECT MGRpassword FROM STUDENT WHERE clubMGR = ${username}`);
+    const rows = await db.all(`SELECT MGRpassword FROM club_manager WHERE clubMGR = ?`, [username]);
     await db.close();
-    hashed = rows[0];
-    const match = bcrypt.compare(password, hashed);
+    if (rows[0] == undefined)
+        return false;
+    hashed = await rows[0]["MGRpassword"];
+    const match = await bcrypt.compare(password, hashed);
     return match;
 };
 
 async function addEvent(eventClub, title, startDate, endDate, visibility, location, poster, wlink) {
     const db = await getDbConnection();
-    const result = await db.run(`INSERT INTO event VALUES(${eventClub},${title},${startDate},${endDate},${visibility},${location},${poster},${wlink})`);
+    const result = await db.run(`INSERT INTO event VALUES(?,?,?,?,?,?,?,?)`
+        , [eventClub, title, startDate, endDate, visibility, location, poster, wlink]);
     await db.close();
     return result;
 };
@@ -35,28 +39,29 @@ async function addEvent(eventClub, title, startDate, endDate, visibility, locati
 async function editEvent(title, startDate, endDate, visibility, location, poster, wlink) {
     const db = await getDbConnection();
     const result = await db.run(`UPDATE event SET
-       title = ${title},
-       startdate = ${startDate},
-       enddate = ${endDate},
-       visibility = ${visibility},
-       location = ${location},
-       poster = ${poster},
-       wlink = ${wlink}
-       )`);
+       title = ?,
+       startdate = ?,
+       enddate = ?,
+       visibility = ?,
+       location = ?,
+       poster = ?,
+       wlink = ?
+       )`, [eventClub, title, startDate, endDate, visibility, location, poster, wlink]);
     await db.close();
     return result;
 };
 
 async function deleteEvent(eventID) {
     const db = await getDbConnection();
-    const result = await db.run(`DELETE FROM event WHERE eventID = ${eventID}`);
+    const result = await db.run(`DELETE FROM event WHERE eventID = ?`, [eventID]);
     await db.close();
     return result;
 };
 
 async function addClub(name, img, description) {
     const db = await getDbConnection();
-    const result = await db.run(`INSERT INTO event VALUES(${name},${img},${description})`);
+    const result = await db.run(`INSERT INTO event VALUES(?,?,?)`
+        , [name, img, description]);
     await db.close();
     return result;
 };
@@ -70,39 +75,41 @@ async function getAllClubs() {
 
 async function getClub(clubID) {
     const db = await getDbConnection();
-    const row = await db.all(`SELECT * FROM club WHERE clubID = ${clubID}`);
+    const row = await db.all(`SELECT * FROM club WHERE clubID = ?`, [clubID]);
     await db.close();
     return row[0];
 }
 
 async function isStudentEnrolled(studentID, eventID) {
     const db = await getDbConnection();
-    const row = await db.all(`SELECT COUNT(*) FROM student_enrollment WHERE enrolledEvent = ${eventID} AND enrolledStu = ${studentID}`);
+    const row = await db.all(`SELECT COUNT(*) FROM student_enrollment WHERE enrolledEvent = ? AND enrolledStu = ?`, [eventID, studentID]);
     await db.close();
     return (row > 0);
 }
 
 async function getAllAnswers(questionID) {
     const db = await getDbConnection();
-    const row = await db.all(`SELECT * FROM answer WHERE forQuestion = ${questionID}`);
+    const row = await db.all(`SELECT * FROM answer WHERE forQuestion = ?`, [questionID]);
     await db.close();
     return row;
 }
 
 async function getStudentAnswer(stuID, questionID) {
     const db = await getDbConnection();
-    const row = await db.all(`SELECT * FROM answer WHERE forQuestion = ${questionID} AND answeringStudent = ${stuID}`);
+    const row = await db.all(`SELECT * FROM answer WHERE forQuestion = ? AND answeringStudent = ?`, [questionID, stuID]);
     await db.close();
     return row[0];
 }
 const addStudent = async (sid, name, email, stuPassword) => {
     const hashPass = await bcrypt.hash(stuPassword, 10);
     const db = await getDbConnection();
-
+    try{
     const rows = db.run(
-        `INSERT into STUDENT VALUES (${sid}, ${name},${email}, ${hashPass})`
-    );
-
+        `INSERT into STUDENT(SID,NAME,EMAIL,STUPASSWORD) VALUES (?,?,?,?)`
+        , [sid, name, email, hashPass]);
+    } catch (err){
+        console.log(err);
+    }
     await db.close();
     return rows;
 };
@@ -112,7 +119,8 @@ const addMGR = async (mgdClub, name, username, email) => {
     const db = await getDbConnection();
 
     const rows = db.run(
-        `insert into club_manager values (${mgdClub},${name}, ${username},${email},${hashPass})`
+        `insert into club_manager values (?,?,?,?,?)`,
+        [mgdClub, name, username, email, hashPass]
     );
 
     await db.close();
@@ -124,10 +132,8 @@ const addQuestions = async (eventId, questionText, mandatory) => {
 
     const rows = db.run(
         `INSERT INTO QUESTION
-      VALUES(
-        ${eventId},
-        ${questionText},
-        ${mandatory})`
+      VALUES(?,?,?
+        )`, [eventId, questionText, mandatory]
     );
 
     await db.close();
@@ -140,11 +146,9 @@ const addAnswer = async (forQuestion, answeringStudent, answerText) => {
     const rows = db.run(
         `
       INSERT INTO answer VALUES(
-      ${forQuestion},
-      ${answeringStudent},
-      ${answerText}
+      ?,?,?
       ) 
-      `
+      `, [forQuestion, answeringStudent, answerText]
     );
 
     await db.close();
@@ -157,10 +161,8 @@ const addEnrollment = async (enrolledEvent, enrolledStu) => {
     const rows = db.run(
         `
       INSERT INTO student_enrollment VALUES(
-      ${enrolledEvent},
-      ${enrolledStu}
-      ) 
-      `
+      ?,?
+      ) `, [enrolledEvent, enrolledStu]
     );
 
     await db.close();
@@ -181,8 +183,8 @@ const getAllEvents = async (endDate) => {
     const rows = db.run(`
     SELECT * 
     from event e
-    where e.endDate <= ${currentDate} 
-     `);
+    where e.endDate <=? 
+     `, [currentDate]);
     await db.close();
     return rows;
 }
@@ -194,11 +196,12 @@ const getEvent = async (eventId) => {
     const rows = db.run(`
     SELECT * 
     FROM event e 
-    where e.eventId = ${eventId}
-    `);
+    where e.eventId = ?
+    `, [eventId]);
     await db.close();
     return rows[0];
 }
+
 
 module.exports = {
     isCorrectCredStudent, isCorrectCredMGT, addEvent, editEvent, deleteEvent, addClub, getAllClubs,
