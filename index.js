@@ -1,12 +1,21 @@
 const express = require("express");
 const app = express();
-const registerRoute = "./routes/register"; // template
+const nunjucks = require("nunjucks");
+const path = require("path");
+const notFoundError = require("./middlewares/NotFoundError")
+const errorHandler = require("./middlewares/errorHandler")
+
+nunjucks.configure("views", { autoescape: true, express: app });
+app.use(express.static(path.join(__dirname, "public")));
+
 
 require('dotenv').config();
 const PORT = process.env.PORT || 3000;
 
+app.get("/",(req,res)=>{
+    res.render("index.html")
+});
 
-app.use("register",registerRoute) // template
 app.use(notFoundError);
 app.use(errorHandler);
 

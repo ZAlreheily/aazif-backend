@@ -1,6 +1,5 @@
 const sqlite3 = require('sqlite3').verbose();
 const bcrypt = require('bcrypt');
-const db = new sqlite3.Database('./db/KFUPM-vents.sqlite');
 
 const getDbConnection = async () => {
     return await sqlite.open({
@@ -96,9 +95,114 @@ async function getStudentAnswer(stuID, questionID) {
     await db.close();
     return row[0];
 }
+const addStudent = async (sid, name, email, stuPassword) => {
+    const hashPass = await bcrypt.hash(stuPassword, 10);
+    const db = await getDbConnection();
+
+    const rows = db.run(
+        `INSERT into STUDENT VALUES (${sid}, ${name},${email}, ${hashPass})`
+    );
+
+    await db.close();
+    return rows;
+};
+
+const addMGR = async (mgdClub, name, username, email) => {
+    const hashPass = await bcrypt.hash(mgrPass);
+    const db = await getDbConnection();
+
+    const rows = db.run(
+        `insert into club_manager values (${mgdClub},${name}, ${username},${email},${hashPass})`
+    );
+
+    await db.close();
+    return rows;
+};
+
+const addQuestions = async (eventId, questionText, mandatory) => {
+    const db = await getDbConnection();
+
+    const rows = db.run(
+        `INSERT INTO QUESTION
+      VALUES(
+        ${eventId},
+        ${questionText},
+        ${mandatory})`
+    );
+
+    await db.close();
+    return rows;
+};
+
+const addAnswer = async (forQuestion, answeringStudent, answerText) => {
+    const db = await getDbConnection();
+
+    const rows = db.run(
+        `
+      INSERT INTO answer VALUES(
+      ${forQuestion},
+      ${answeringStudent},
+      ${answerText}
+      ) 
+      `
+    );
+
+    await db.close();
+    return rows;
+};
+
+const addEnrollment = async (enrolledEvent, enrolledStu) => {
+    const db = await getDbConnection();
+
+    const rows = db.run(
+        `
+      INSERT INTO student_enrollment VALUES(
+      ${enrolledEvent},
+      ${enrolledStu}
+      ) 
+      `
+    );
+
+    await db.close();
+    return rows;
+};
+
+
+const getAllEvents = async (endDate) => {
+    const db = await getDbConnection();
+    const date = new Date();
+
+    let day = date.getDate();
+    let month = date.getMonth() + 1;
+    let year = date.getFullYear();
+
+    let currentDate = `${year}-${month}-${day}`;
+
+    const rows = db.run(`
+    SELECT * 
+    from event e
+    where e.endDate <= ${currentDate} 
+     `);
+    await db.close();
+    return rows;
+}
+
+const getEvent = async (eventId) => {
+    const db = await getDbConnection();
+    const date = new Data();
+
+    const rows = db.run(`
+    SELECT * 
+    FROM event e 
+    where e.eventId = ${eventId}
+    `);
+    await db.close();
+    return rows[0];
+}
 
 module.exports = {
     isCorrectCredStudent, isCorrectCredMGT, addEvent, editEvent, deleteEvent, addClub, getAllClubs,
-    getClub, isStudentEnrolled, getAllAnswers, getStudentAnswer,
+    getClub, isStudentEnrolled, getAllAnswers, getStudentAnswer, addStudent, addQuestions, addMGR,
+    addAnswer, addEnrollment, getAllEvents, getEvent
 };
 

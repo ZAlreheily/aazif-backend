@@ -21,10 +21,8 @@ async function createTables() {
     sql = `CREATE TABLE IF NOT EXISTS 
     STUDENT(
       SID INTEGER NOT NULL UNIQUE, 
-      FNAME NOT NULL,
-      LNAME NOT NULL,
+      NAME NOT NULL,
       EMAIL	NOT NULL,
-      PHONE NOT NULL,
       stuPassword NOT NULL
       )`;
     await db.run(sql);
@@ -32,8 +30,7 @@ async function createTables() {
     club_manager(
         clubMGR INTEGER PRIMARY KEY AUTOINCREMENT,
         mgdClub NOT NULL,
-        fname NOT NULL,
-        lname NOT NULL,
+        name NOT NULL,
         username UNIQUE NOT NULL,
         EMAIL NOT NULL,
         MGRpassword NOT NULL,
