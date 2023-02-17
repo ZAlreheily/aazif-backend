@@ -1,9 +1,9 @@
 const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('./db/KFUPM-vents.db');
+const db = new sqlite3.Database('./db/KFUPM-vents.sqlite');
 
 const getDbConnection = async () => {
     return await sqlite.open({
-        filename: './db/KFUPM-Events.db',
+        filename: './db/KFUPM-Events.sqlite',
         driver: sqlite3.Database
     })
 };
