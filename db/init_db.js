@@ -24,7 +24,8 @@ async function createTables() {
       FNAME NOT NULL,
       LNAME NOT NULL,
       EMAIL	NOT NULL,
-      PHONE NOT NULL
+      PHONE NOT NULL,
+      stuPassword NOT NULL
       )`;
     await db.run(sql);
     sql = `CREATE TABLE IF NOT EXISTS 
@@ -35,6 +36,7 @@ async function createTables() {
         lname NOT NULL,
         username UNIQUE NOT NULL,
         EMAIL NOT NULL,
+        MGRpassword NOT NULL,
         FOREIGN KEY(mgdClub) REFERENCES club(clubID)
         )`;
     await db.run(sql);
@@ -44,10 +46,11 @@ async function createTables() {
         eventID INTEGER PRIMARY KEY AUTOINCREMENT,
         eventclub NOT NULL,
         title NOT NULL,
-        startDate DATETIME NOT NULL,
-        endDate DATETIME NOT NULL,
+        startDate DATE NOT NULL,
+        endDate DATE NOT NULL,
         visibility NOT NULL,
         LOCATION,
+        poster,
         wLink,
         FOREIGN KEY(eventclub) REFERENCES club(clubID)
         )`;
