@@ -1,0 +1,84 @@
+body{
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+    background-color: #dddddd;
+}
+
+.container{
+    margin-top: 100px;
+    margin-right: auto;
+    margin-left: auto;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+    justify-content: space-between;
+}
+.horizontal{
+    display: flex;
+    flex-direction: row;
+}
+.linePicker{
+    width:50px;
+}
+input{
+    width: 300px;
+    height:50px;
+    margin: 10px 5px;
+}
+input[type="text"]{
+    border-radius: 9px;
+    text-align: center;
+    box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.3);
+    filter: drop-shadow(5px 5px 5px rgba(0,0,0,0.3));
+}
+
+input{
+    border-radius: 9px;
+    text-align: center;
+    box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.3);
+    filter: drop-shadow(5px 5px 5px rgba(0,0,0,0.3));
+}
+
+input[type="text"]::placeholder{
+    text-align: center;
+}
+
+input[type="file"]{
+    display: none;
+    
+    border-radius: 9px;
+    
+}
+label{
+    border: 2px solid;
+    cursor: pointer;
+    font-size: 40px;
+}
+
+.btn-add {
+    background: #f05454;
+    background-image: -webkit-linear-gradient(top, #f05454, #2980b9);
+    background-image: -moz-linear-gradient(top, #f05454, #2980b9);
+    background-image: -ms-linear-gradient(top, #f05454, #2980b9);
+    background-image: -o-linear-gradient(top, #f05454, #2980b9);
+    background-image: linear-gradient(to bottom, #f05454, #2980b9);
+    -webkit-border-radius: 28;
+    -moz-border-radius: 28;
+    border-radius: 28px;
+    text-shadow: 0px 2px 10px #666666;
+    -webkit-box-shadow: 5px 0px 3px #666666;
+    -moz-box-shadow: 5px 0px 3px #666666;
+    box-shadow: 5px 0px 3px #666666;
+    color: #ffffff;
+    font-size: 22px;
+    background: #f05454;
+    padding: 10px 20px 10px 20px;
+    text-decoration: none;
+    transition: opacity 0.6s;
+  }
+  
+  .btn-add:hover {
+    opacity: 0.6;
+    cursor: pointer;
+  }
