@@ -26,10 +26,13 @@ signIn.addEventListener('click', ()=>{
     loginUp.classList.toggle('none')
 })
 
-// var allEvents = document.querySelectorAll(".event");
-// for(var i  = 0 ; i < allEvents.length ; i++){
-//     allEvents[i].addEventListener("click", function handleClick(){
-//     allEvents[i].classList.add("zoom");
-//     });
-// }
 
+signUp2.addEventListener('click', ()=>{
+    // Remove classes first if they exist
+    loginIn.classList.remove('block')
+    loginUp.classList.remove('none')
+
+    // Add classes
+    loginIn.classList.toggle('none')
+    loginUp.classList.toggle('block')
+})

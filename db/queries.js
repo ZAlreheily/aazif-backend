@@ -30,7 +30,8 @@ async function isCorrectCredMGT(username, password) {
 
 async function addEvent(eventClub, title, startDate, endDate, visibility, location, poster, wlink) {
     const db = await getDbConnection();
-    const result = await db.run(`INSERT INTO event VALUES(?,?,?,?,?,?,?,?)`
+    const result = await db.run(`INSERT INTO event(eventClub, title, startDate, endDate, visibility, location, poster, wlink)
+     VALUES(?,?,?,?,?,?,?,?)`
         , [eventClub, title, startDate, endDate, visibility, location, poster, wlink]);
     await db.close();
     return result;
@@ -60,7 +61,7 @@ async function deleteEvent(eventID) {
 
 async function addClub(name, img, description) {
     const db = await getDbConnection();
-    const result = await db.run(`INSERT INTO event VALUES(?,?,?)`
+    const result = await db.run(`INSERT INTO club(name,img,description) VALUES(?,?,?)`
         , [name, img, description]);
     await db.close();
     return result;
@@ -103,15 +104,15 @@ async function getStudentAnswer(stuID, questionID) {
 const addStudent = async (sid, name, email, stuPassword) => {
     const hashPass = await bcrypt.hash(stuPassword, 10);
     const db = await getDbConnection();
-    try{
-    const rows = db.run(
-        `INSERT into STUDENT(SID,NAME,EMAIL,STUPASSWORD) VALUES (?,?,?,?)`
-        , [sid, name, email, hashPass]);
-    } catch (err){
+    try {
+        const rows = db.run(
+            `INSERT into STUDENT(SID,NAME,EMAIL,STUPASSWORD) VALUES (?,?,?,?)`
+            , [sid, name, email, hashPass]);
+            return rows;
+    } catch (err) {
         console.log(err);
     }
     await db.close();
-    return rows;
 };
 
 const addMGR = async (mgdClub, name, username, email) => {
@@ -160,7 +161,7 @@ const addEnrollment = async (enrolledEvent, enrolledStu) => {
 
     const rows = db.run(
         `
-      INSERT INTO student_enrollment VALUES(
+      INSERT INTO student_enrollment(enrolledEvent,enrolledStu) VALUES(
       ?,?
       ) `, [enrolledEvent, enrolledStu]
     );
@@ -180,7 +181,7 @@ const getAllEvents = async (endDate) => {
 
     let currentDate = `${year}-${month}-${day}`;
 
-    const rows = db.run(`
+    const rows = await db.all(`
     SELECT * 
     from event e
     where e.endDate <=? 
@@ -191,9 +192,8 @@ const getAllEvents = async (endDate) => {
 
 const getEvent = async (eventId) => {
     const db = await getDbConnection();
-    const date = new Data();
 
-    const rows = db.run(`
+    const rows = await db.all(`
     SELECT * 
     FROM event e 
     where e.eventId = ?

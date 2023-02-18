@@ -1,8 +1,8 @@
 function isLoggedIn(req, res, next) {
-    if (!req.session?.email) {
-        return res.redirect(`/login`)
+    if (!req.session?.id && !req.session?.username) {
+        return res.redirect(`/login`);
     }
-    next()
-}
+    next();
+};
 
 module.exports = isLoggedIn;

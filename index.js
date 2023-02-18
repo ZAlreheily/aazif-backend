@@ -7,8 +7,11 @@ const cookieParser = require('cookie-parser');
 
 const notFoundError = require("./middlewares/NotFoundError");
 const errorHandler = require("./middlewares/errorHandler");
-const logregRoute = require("./routes/logreg");
+const loginRoute = require("./routes/login");
+const signupRoute = require("./routes/signup");
 const eventRoute = require("./routes/event");
+const homeRoute = require("./routes/homeRoute");
+const enrollRoute = require("./routes/enroll");
 
 require('dotenv').config();
 const PORT = process.env.PORT || 3000;
@@ -25,9 +28,11 @@ app.use(session({
     secret: 'somevalue'
 }));
 
-
-app.use("/login", logregRoute);
-app.use("/event",eventRoute);
+app.use("/", homeRoute)
+app.use("/login", loginRoute);
+app.use("/signup", signupRoute);
+app.use("/event", eventRoute);
+app.use("/enroll", enrollRoute);
 
 app.use(notFoundError);
 app.use(errorHandler);
@@ -35,3 +40,4 @@ app.use(errorHandler);
 app.listen(PORT, () => {
     console.log(`Server is Running on Port ${PORT}`)
 })
+

@@ -18,7 +18,7 @@
             </div>
 
             <div class="login__forms">
-                <form method="post" class="login__registre" id="login-in" action="login/login">
+                <form method="post" class="login__registre" id="login-in" action="/login">
                     <h1 class="login__title">Sign In</h1>
 
                     <div class="login__box">
@@ -40,14 +40,14 @@
                 </form>
 
                 <script>
-                    function submitLogin(){
+                    function submitLogin() {
                         document.getElementById("login-in").submit()
                     }
-                    function submitSignup(){
+                    function submitSignup() {
                         document.getElementById("login-up").submit()
                     }
                 </script>
-                <form method="post" class="login__create none" id="login-up" action="/login/register">
+                <form method="post" class="login__create none" id="login-up" action="/signup/register">
                     <h1 class="login__title">Create Account</h1>
 
                     <div class="login__box">
@@ -86,8 +86,16 @@
             </div>
         </div>
     </div>
-
     <script src="assets/js/main.js"></script>
+    {% if signup %}
+    <script>
+        loginIn.classList.remove('block')
+        loginUp.classList.remove('none')
+
+        loginIn.classList.toggle('none')
+        loginUp.classList.toggle('block')
+    </script>
+    {% endif %}
 </body>
 
 </html>
